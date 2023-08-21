@@ -13,7 +13,7 @@ pipeline{
         }
    tools{
 
-      maven '3.9.0'
+      maven '3.9.4'
    }
 
    stages{
@@ -41,7 +41,7 @@ pipeline{
             }
                   steps{
                       script{
-                      withSonarQubeEnv('sonar') { 
+                      withSonarQubeEnv('sonarqube-8.9.2') { 
                       sh "mvn sonar:sonar"
                        }
                       timeout(time: 1, unit: 'HOURS') {
@@ -100,7 +100,7 @@ pipeline{
         steps{
             script{
                    sh 'docker build . -t nkarwapanitech/devops-training:$Docker_tag'
-		          withCredentials([string(credentialsId: 'docker', variable: 'docker_password')]) {		    
+		          withCredentials([string(credentialsId: 'dockerhublogin', variable: 'docker_password')]) {		    
 				  sh 'docker login -u nkarwapanitech -p $docker_password'
 				  sh 'docker push nkarwapanitech/devops-training:$Docker_tag'
 			}
