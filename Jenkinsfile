@@ -34,7 +34,7 @@ pipeline{
        stage('Quality Gate Statuc Check'){
                   steps{
                       script{
-                      withSonarQubeEnv('sonarqube-8.9.2') { 
+                      withSonarQubeEnv('sonar') { 
                       sh "mvn sonar:sonar"
                        }
                       timeout(time: 1, unit: 'HOURS') {
@@ -132,7 +132,7 @@ pipeline{
 }
 def custom_msg()
 {
-  def JENKINS_URL= "http://3.233.241.149:8080/"
+  def JENKINS_URL= "http://34.206.209.237:8080/"
   def JOB_NAME = env.JOB_NAME
   def BUILD_ID= env.BUILD_ID
   def JENKINS_LOG= " Success: Job [${env.JOB_NAME}] Logs path: ${JENKINS_URL}/job/${JOB_NAME}/${BUILD_ID}/consoleText"
