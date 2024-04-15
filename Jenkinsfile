@@ -94,7 +94,7 @@ pipeline{
         steps{
             script{
                    sh 'docker build . -t nkarwapanitech/devops-training:$Docker_tag'
-		          withCredentials([string(credentialsId: 'dockerhublogin', variable: 'docker_password')]) {		    
+		          withCredentials([string(credentialsId: 'docker', variable: 'docker_password')]) {		    
 				  sh 'docker login -u nkarwapanitech -p $docker_password'
 				  sh 'docker push nkarwapanitech/devops-training:$Docker_tag'
 			}
