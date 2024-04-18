@@ -1,6 +1,15 @@
+currentBuild.displayName = "Build # "+currentBuild.number
+
+   def getDockerTag(){
+        def tag = sh script: 'git rev-parse HEAD', returnStdout: true
+        return tag
+        }
 pipeline{
 
    agent { label 'node01' }
+   environment{
+	    Docker_tag = getDockerTag()
+        }
    tools{
 
       maven '3.9.6'
@@ -65,6 +74,40 @@ pipeline{
         }
        
        }
+       stage("Approval"){
 
+        steps{
+
+            timeout(time: 15, unit: 'MINUTES'){ 
+	        input message: 'Do you approve deployment for production?' , ok: 'Yes'}
+
+        }
+       }
+
+       stage("Prod build"){
+        steps{
+            script{
+                   sh 'docker build . -t nkarwapanitech/devops-training:$Docker_tag'
+		          withCredentials([string(credentialsId: 'docker', variable: 'docker_password')]) {		    
+				  sh 'docker login -u nkarwapanitech -p $docker_password'
+				  sh 'docker push nkarwapanitech/devops-training:$Docker_tag'
+			        }
+                    }
+                }
+        }
+
+       stage('ansible playbook'){
+	        agent { label 'node01' }
+			steps{
+			 	script{
+				    sh '''final_tag=$(echo $Docker_tag | tr -d ' ')
+				     echo ${final_tag}test
+				     sed -i "s/docker_tag/$final_tag/g"  deployment.yaml
+				     '''
+				    ansiblePlaybook become: true, installation: 'ansible', inventory: 'hosts', playbook: 'ansible.yaml'
+				}
+			}
+
+   }
    }
 }
